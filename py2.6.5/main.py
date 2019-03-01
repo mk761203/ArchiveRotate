@@ -1,14 +1,22 @@
 import os
-import pathlib
 import shutil
 import sys
 import datetime
+from optparse import OptionParser
 
 # config
-_location = '/tmp/testqq'
-_min_disk_space_bytes = 30 * 10 ** 9
-_max_files_to_remove = 10
-_min_path_length = 10
+parser = OptionParser()
+parser.add_option("-p", "--path", type="string", help="location where backup files/folders are stored")
+parser.add_option("-m", "--min-disk-space", type="long", help="minimum required disk space in bytes")
+parser.add_option("-e", "--eval-min-disk-space", type="string",
+                  help="expression which evaluate to minimum required disk space in bytes e.g. 30 * 10 ** 9")
+parser.add_option("-f", "--max-files-to-remove", type="long", help="maximum number of files to remove")
+parser.add_option("-l", "--min-path-length", type="long", default=1, help="minimum path length (defense)")
+(opts, args) = parser.parse_args(sys.argv)
+_location = opts.path
+_min_disk_space_bytes = eval(opts.eval_min_disk_space) if opts.eval_min_disk_space else opts.min_disk_space
+_max_files_to_remove = opts.max_files_to_remove
+_min_path_length = opts.min_path_length
 _remove_function = shutil.rmtree  # for directories
 # _remove_function = os.remove  # for files
 
@@ -47,8 +55,8 @@ class ArchiveRotate:
             self.end(_EXIT_STATUS_PATH_TOO_SHORT)
 
     def check_directory(self):
-        if not pathlib.Path(_location).exists():
-            self.log += ['directory: {} not found'.format(_location)]
+        if not os.path.exists(_location):
+            self.log += ['file: {} not found'.format(_location)]
             self.end(_EXIT_STATUS_DIRECTORY_NOT_FOUND)
 
     def remove_files(self):
