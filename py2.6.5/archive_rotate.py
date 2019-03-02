@@ -3,6 +3,7 @@
 
 import os
 import sys
+import shutil
 import datetime
 from optparse import OptionParser
 
@@ -28,8 +29,6 @@ _min_disk_space_bytes = eval(opts.eval_min_disk_space) if opts.eval_min_disk_spa
 _max_files_to_remove = opts.max_files_to_remove
 _min_path_length = opts.min_path_length
 _log_directory_content = opts.log_directory_content
-# import shutil; _remove_function = shutil.rmtree  # for directories
-_remove_function = os.remove  # for files
 
 if None in [_location, _min_disk_space_bytes]:
     print('\nLack of required parameter(s).\n')
@@ -61,7 +60,12 @@ class ArchiveRotate:
         file_to_remove = os.path.join(_location, files[0])
         if len(file_to_remove) >= _min_path_length:
             self.log += ['removing: {0}'.format(file_to_remove)]
-            _remove_function(file_to_remove)
+            if os.path.isdir(file_to_remove):
+                shutil.rmtree(file_to_remove)
+            elif os.path.isfile(file_to_remove):
+                os.remove(file_to_remove)
+            else:
+                self.log += ['not recognized type of file: {0}, not removed'.format(file_to_remove)]
         else:
             self.log += ['path too short: {0}, operation aborted'.format(file_to_remove)]
             self.end(_EXIT_STATUS_PATH_TOO_SHORT)
