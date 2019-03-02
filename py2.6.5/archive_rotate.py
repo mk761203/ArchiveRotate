@@ -1,3 +1,6 @@
+#!/usr/bin/python
+# https://github.com/mk761203/ArchiveRotate
+
 import os
 import sys
 import datetime
@@ -29,7 +32,7 @@ _log_directory_content = opts.log_directory_content
 _remove_function = os.remove  # for files
 
 if None in [_location, _min_disk_space_bytes]:
-    print('\nLack of required parameter(s)./\n')
+    print('\nLack of required parameter(s).\n')
     parser.print_help()
     sys.exit(_EXIT_STATUS_LACK_OF_PARAMS)
 
@@ -42,7 +45,7 @@ class ArchiveRotate:
     def ls(self, _dir, comment=None):
         files = os.listdir(_dir)
         if _log_directory_content:
-            self.log += ['[{}] file: {}, content: {}'.format(comment, _dir, files)]
+            self.log += ['[{0}] file: {1}, content: {2}'.format(comment, _dir, files)]
 
     @staticmethod
     def bytes_free_on_drive():
@@ -57,15 +60,15 @@ class ArchiveRotate:
             self.end(_EXIT_STATUS_OK)
         file_to_remove = os.path.join(_location, files[0])
         if len(file_to_remove) >= _min_path_length:
-            self.log += ['removing: {}'.format(file_to_remove)]
+            self.log += ['removing: {0}'.format(file_to_remove)]
             _remove_function(file_to_remove)
         else:
-            self.log += ['path too short: {}, operation aborted'.format(file_to_remove)]
+            self.log += ['path too short: {0}, operation aborted'.format(file_to_remove)]
             self.end(_EXIT_STATUS_PATH_TOO_SHORT)
 
     def check_directory(self):
         if not os.path.exists(_location):
-            self.log += ['file: {} not found'.format(_location)]
+            self.log += ['file: {0} not found'.format(_location)]
             self.end(_EXIT_STATUS_DIR_NOT_FOUND)
 
     def remove_files(self):
@@ -77,10 +80,10 @@ class ArchiveRotate:
         self.ls(_location, 'after')
 
     def begin(self):
-        self.log += ['begin: {}'.format(datetime.datetime.now())]
+        self.log += ['begin: {0}'.format(datetime.datetime.now())]
 
     def end(self, _exit_status):
-        self.log += ['end: {}, with status: {}'.format(datetime.datetime.now(), _exit_status)]
+        self.log += ['end: {0}, with status: {1}'.format(datetime.datetime.now(), _exit_status)]
         if self.print_log or _exit_status != 0:
             for entry in self.log:
                 print(entry)
@@ -88,7 +91,7 @@ class ArchiveRotate:
 
     def get_free_space(self):
         bytes_free = self.bytes_free_on_drive()
-        self.log += ['drive: {}, bytes free: {}'.format(_location, bytes_free)]
+        self.log += ['drive: {0}, bytes free: {1}'.format(_location, bytes_free)]
         return bytes_free
 
     def execute(self):
