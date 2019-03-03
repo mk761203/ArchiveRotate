@@ -14,6 +14,16 @@ _EXIT_STATUS_PATH_TOO_SHORT = 10
 _EXIT_STATUS_DIR_NOT_FOUND = 11
 
 
+def human_readable(number):
+    index = 0
+    suffix = ['B', 'kB', 'MB', 'GB', 'TB']
+    print(len(suffix))
+    while number >= 1024 and index < len(suffix) - 1:
+        number /= 1024.0
+        index += 1
+    return str(round(number, 2)) + suffix[index]
+
+
 class ArchiveRotate:
     location = None  # type: str
     min_disk_space_bytes = None  # type: long
@@ -77,7 +87,7 @@ class ArchiveRotate:
         sys.exit(_exit_status)
 
     def get_free_space(self):
-        bytes_free = self.bytes_free_on_drive()
+        bytes_free = human_readable(self.bytes_free_on_drive())
         self.log += ['drive: {0}, bytes free: {1}'.format(self.location, bytes_free)]
         return bytes_free
 
